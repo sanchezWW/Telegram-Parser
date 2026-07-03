@@ -4,7 +4,10 @@ from typing import Optional, Dict, Any
 from telethon import TelegramClient
 # ТРИ важных импорта для поддержки MTProto-подключений:
 from telethon.network import ConnectionTcpMTProxyIntermediate, ConnectionTcpMTProxyAbridged
-import socks 
+import socks
+from telethon.errors import SessionPasswordNeededError
+from telethon import events
+
 
 logger = logging.getLogger(__name__)
 
@@ -102,11 +105,15 @@ class TelegramManager:
                 
                 if not await client.is_user_authorized():
                     logger.info("Отправка кода авторизации...")
-                    await client.send_code_request(phone, force_sms=True)
-                    # Внимание: input() заблокирует весь асинхронный FastAPI сервер на время ввода кода. 
-                    # Позже это нужно будет вынести во второй POST-метод API.
-                    code = input(f"\nВведите код для {phone}: ")
-                    await client.sign_in(phone, code)
+                    try:
+                        await client.send_code_request(phone, force_sms=True)
+                        code = input(f"\nВведите код из Telegram/СМС для {phone}: ")
+                        await client.sign_in(phone, code)
+                    except SessionPasswordNeededError:
+                        logger.info("🔒 На аккаунте включена двухфакторная аутентификация (2FA).")
+                        # Запрашиваем облачный пароль в консоли
+                        password = input(f"Введите ваш пароль двухэтапной аутентификации: ")
+                        await client.sign_in(password=password)
                 
                 me = await client.get_me()
                 logger.info(f"🎉 Успешно авторизован как {me.first_name} (@{me.username})")

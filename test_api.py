@@ -3,11 +3,11 @@ import time
 import requests
 
 URL = "http://localhost:8000/telegram/connect"
-PHONE = "+79001234567"
+PHONE = "+7123456789"
 
 # Перебираем все возможные порты мобильных и локальных прокси-клиентов
-POSSIBLE_PORTS = [1080, 2080, 2081, 7890, 10808, 10809]
-PROXY_TYPES = ["http", "socks5"]
+POSSIBLE_PORTS = [10808]
+PROXY_TYPES = ["socks5"]
 
 def try_connect():
     print("Запуск автоматического тестирования подключения к Telegram...")
@@ -29,7 +29,7 @@ def try_connect():
             
             try:
                 # Увеличиваем timeout до 65 секунд, так как Telethon долго проверяет порты
-                response = requests.post(URL, json=payload, timeout=65)
+                response = requests.post(URL, json=payload, timeout=5)
                 print(f"Статус ответа сервера: {response.status_code}")
                 print(f"Ответ API: {response.text}")
                 
