@@ -3,7 +3,7 @@ import time
 import requests
 
 URL = "http://localhost:8000/telegram/connect"
-PHONE = "+7123456789"
+PHONE = "+79001234567"
 
 # Перебираем все возможные порты мобильных и локальных прокси-клиентов
 POSSIBLE_PORTS = [10808]
